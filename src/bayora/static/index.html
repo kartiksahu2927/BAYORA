@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bayora</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="cinematic-scene" aria-hidden="true">
+    <div class="role-backdrop"></div>
+    <div class="scene-art scene-art-red"></div>
+    <div class="scene-art scene-art-blue"></div>
+    <div class="scene-art scene-art-neutral"></div>
+    <div class="scene-haze"></div>
+    <canvas id="particle-canvas"></canvas>
+    <div class="scene-vignette"></div>
+  </div>
+  <header class="topbar">
+    <div class="brand-mark">B</div>
+    <div>
+      <div class="brand">Bayora</div>
+      <div class="subtitle">Secure Adversarial AI Testing Infrastructure</div>
+    </div>
+    <div class="workspace-identity" aria-live="polite">
+      <span id="workspace-role" class="role-badge">SECURITY ADMINISTRATOR <b>● ACTIVE</b></span>
+      <span id="workspace-label" class="workspace-label">Control &amp; Policy Workspace</span>
+    </div>
+    <div class="session-picker">
+      <label for="role">Active role</label>
+      <select id="role">
+        <option value="red">Red Team</option>
+        <option value="blue">Blue Team</option>
+        <option value="admin" selected>Security Administrator</option>
+        <option value="auditor">Auditor</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p id="workspace-eyebrow" class="eyebrow">CONTROL PLANE / SECURITY EVALUATION</p>
+        <h1 id="workspace-title">Measure the boundary.<br><span>Protect the model.</span></h1>
+        <p id="workspace-copy" class="hero-copy">Run adversarial evaluations inside explicit tenant and session boundaries, then verify every security decision.</p>
+      </div>
+      <div class="status-card">
+        <div class="status-dot"></div>
+        <div><strong id="health-status">Checking service</strong><span>Bayora control plane</span></div>
+      </div>
+      <div class="provider-card">
+        <div><span>LLM Provider</span><strong id="llm-provider">Checking</strong></div>
+        <div><span>LLM Status</span><strong id="llm-status">Checking</strong></div>
+        <div><span>Model</span><strong id="llm-model">—</strong></div>
+        <div><span>Health detail</span><strong id="llm-health-message">—</strong></div>
+        <div><span>Authorization</span><strong id="authorization-status">Checking identity</strong></div>
+      </div>
+    </section>
+
+    <section class="grid two-up">
+      <article class="panel validation-panel">
+        <div class="panel-heading"><div><p id="validation-eyebrow" class="eyebrow">LIVE CONTROL CHECK</p><h2 id="validation-title">Security Validation</h2></div><button id="run-validation" class="button primary">Run validation</button></div>
+        <p id="validation-copy" class="muted">Exercise policy enforcement, the isolated model worker, and audit integrity from one reproducible run.</p>
+        <div id="validation-summary" class="validation-summary empty">No validation run yet.</div>
+        <div id="validation-results" class="control-list"></div>
+      </article>
+
+      <article class="panel create-panel">
+        <div class="panel-heading"><div><p id="evaluation-eyebrow" class="eyebrow">RED TEAM WORKSPACE</p><h2 id="evaluation-title">New Evaluation</h2></div><span id="evaluation-pill" class="pill">isolated session</span></div>
+        <div id="evaluation-form">
+          <label id="prompt-label" for="prompt">Evaluation prompt</label>
+          <textarea id="prompt" maxlength="12000" placeholder="Describe a controlled behavior probe for the model..."></textarea>
+          <div class="form-footer"><span id="evaluation-hint" class="muted">Input is hashed for audit provenance.</span><button id="create-evaluation" class="button primary">Start evaluation</button></div>
+        </div>
+        <form id="blue-analysis-form" hidden>
+          <label for="blue-assessment">Authorized assessment</label>
+          <select id="blue-assessment" disabled><option value="">Loading authorized assessments...</option></select>
+          <p id="blue-assessment-status" class="muted" role="status">Loading authorized assessments...</p>
+          <label for="blue-instructions">Analysis instructions (optional context)</label>
+          <textarea id="blue-instructions" maxlength="2000" placeholder="Optional defensive focus for this assessment. Stored input, response, and findings are used automatically." disabled></textarea>
+          <div class="form-footer"><span class="muted">Analyze recorded findings; no need to reenter stored evidence.</span><button id="analyze-findings" class="button primary" type="submit" disabled>Analyze recorded findings</button></div>
+          <div id="blue-analysis-message" class="message" role="status" hidden></div>
+        </form>
+        <div id="role-context" class="role-context" hidden>
+          <p id="context-scope" class="muted">Checking authorized workspace scope...</p>
+          <h3 id="policy-title">Defensive rules</h3>
+          <div id="workspace-policy" class="context-list" aria-live="polite">Loading policy...</div>
+          <h3 id="findings-title">Findings</h3>
+          <div id="workspace-findings" class="context-list" aria-live="polite">Loading authorized findings...</div>
+        </div>
+        <div id="evaluation-message" class="message" role="status"></div>
+      </article>
+    </section>
+
+    <section class="panel result-panel">
+      <div class="panel-heading"><div><p class="eyebrow">MODEL OUTPUT</p><h2>Evaluation Result</h2></div><span id="result-state" class="pill">waiting</span></div>
+      <div class="result-grid">
+        <div><span class="field-label">Session ID</span><code id="result-session">—</code></div>
+        <div><span class="field-label">Provider</span><span id="result-provider">—</span></div>
+        <div><span class="field-label">Model</span><span id="result-model">—</span></div>
+        <div><span class="field-label">Status</span><span id="result-status">—</span></div>
+        <div><span class="field-label">Timestamp</span><span id="result-timestamp">—</span></div>
+        <div><span class="field-label">Latency</span><span id="result-latency">—</span></div>
+        <div><span class="field-label">Policy decision</span><span id="result-decision">—</span></div>
+      </div>
+      <div id="result-warning" class="fixture-warning" hidden>Test Fixture — Not Real Model Evidence</div>
+      <div id="result-original-input" class="result-output" hidden>
+        <span class="field-label">Original evaluation input · recorded evidence</span>
+        <pre id="result-prompt"></pre>
+      </div>
+      <div class="result-output">
+        <span class="field-label">Response</span>
+        <pre id="result-response">Run an evaluation to receive model output.</pre>
+      </div>
+      <div class="result-meta">
+        <div><span class="field-label">Finding</span><span id="result-finding">None</span></div>
+        <div><span class="field-label">Audit event reference</span><div id="result-audit" class="audit-events">—</div></div>
+      </div>
+      <div id="assessment-message" class="message" role="status" hidden></div>
+      <form id="blue-share-form" class="role-context" hidden>
+        <h3>Share this assessment with Blue Team</h3>
+        <label for="blue-recipient">Explicit recipient</label>
+        <div class="form-footer"><select id="blue-recipient" required disabled><option value="">Select a Blue Team recipient</option></select><button id="share-blue" class="button ghost" type="submit" disabled>Share with Blue Team</button></div>
+        <p class="muted">Grant one recipient permission to this assessment. Sharing does not automatically transfer data or start an analysis.</p>
+        <div id="blue-share-message" class="message" role="status" hidden></div>
+      </form>
+      <div id="blue-history" class="role-context" hidden>
+        <div class="panel-heading"><h3>Defensive analysis history · advisory / unverified</h3><button id="refresh-blue-history" class="button ghost" type="button" disabled>Refresh history</button></div>
+        <p class="muted">Defensive output is separate from the target response. Analysis does not change code, implement fixes, retest, or verify defenses.</p>
+        <div id="blue-analyses" class="control-list" aria-live="polite"></div>
+        <h3>Remediation notes · not retested / not verified</h3>
+        <div id="remediation-history" class="control-list" aria-live="polite"></div>
+        <details id="remediation-notes-panel" hidden>
+          <summary class="muted">Record remediation notes (Blue Team)</summary>
+          <form id="remediation-form">
+            <label for="remediation-status">Reported status</label>
+            <select id="remediation-status" disabled><option value="recommended">Recommended</option><option value="implemented">Implemented (user-reported)</option></select>
+             <label for="remediation-notes">Notes (required, up to 2000 characters)</label>
+             <textarea id="remediation-notes" maxlength="2000" required disabled></textarea>
+            <label id="remediation-evidence-label" for="remediation-evidence">Supporting evidence (optional, up to 2000 characters)</label>
+            <textarea id="remediation-evidence" maxlength="2000" disabled></textarea>
+            <div class="form-footer"><span class="muted">Implementation is user-reported, not retested or verified.</span><button id="record-remediation" class="button ghost" type="submit" disabled>Record notes</button></div>
+            <div id="remediation-message" class="message" role="status" hidden></div>
+          </form>
+        </details>
+      </div>
+    </section>
+
+    <section class="grid two-up lower-grid">
+      <article class="panel">
+        <div class="panel-heading"><div><p id="sessions-eyebrow" class="eyebrow">PROVENANCE</p><h2 id="sessions-title">Evaluation Sessions</h2></div><div class="panel-actions"><button id="refresh" class="button ghost">Refresh</button><span id="session-refresh-status" class="refresh-status" role="status" aria-live="polite"></span></div></div>
+        <div id="evaluations" class="table-wrap"><div class="empty">Loading sessions...</div></div>
+      </article>
+      <article class="panel">
+        <div class="panel-heading"><div><p id="audit-eyebrow" class="eyebrow">INTEGRITY MONITOR</p><h2 id="audit-title">Audit Chain</h2></div><div class="panel-actions"><button id="refresh-audit" class="button ghost">Verify now</button><span id="audit-badge" class="pill">checking</span></div></div>
+        <div id="audit-status" class="audit-status">Verifying signed records...</div>
+        <div class="boundary-list">
+          <div><span>RED</span><b>→</b><span>LLM</span><em class="allow">ALLOW</em></div>
+          <div><span>RED</span><b>→</b><span>BLUE PRIVATE DATA</span><em class="block">BLOCK</em></div>
+          <div><span>RED</span><b>→</b><span>HOST</span><em class="block">BLOCK</em></div>
+          <div><span>SESSION A</span><b>↔</b><span>SESSION B</span><em class="block">BLOCK</em></div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <footer>Bayora · Security Evaluation Control Plane</footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" role="img" aria-label="Abstract anonymous security mask silhouette">
+  <defs>
+    <linearGradient id="mask" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#263142"/>
+      <stop offset="1" stop-color="#080c13"/>
+    </linearGradient>
+    <linearGradient id="shadow" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".8"/>
+    </linearGradient>
+  </defs>
+  <path d="M300 34c-133 0-226 86-226 224 0 195 86 337 226 408 140-71 226-213 226-408C526 120 433 34 300 34Z" fill="url(#mask)" stroke="#4d5b70" stroke-opacity=".45" stroke-width="4"/>
+  <path d="M78 252c29-99 111-166 222-166s193 67 222 166c-52-37-109-55-172-55H250c-63 0-120 18-172 55Z" fill="#05080d" opacity=".75"/>
+  <path d="m111 286 122-25 53 18-25 60-91 4Z" fill="#080c13" stroke="#65758d" stroke-opacity=".35" stroke-width="3"/>
+  <path d="m489 286-122-25-53 18 25 60 91 4Z" fill="#080c13" stroke="#65758d" stroke-opacity=".35" stroke-width="3"/>
+  <path d="M180 316c32-18 67-18 102 0-29 22-64 27-102 0Zm240 0c-32-18-67-18-102 0 29 22 64 27 102 0Z" fill="#040609" stroke="#8b9ab0" stroke-opacity=".35" stroke-width="3"/>
+  <path d="M300 303v154l-38 56 38 25 38-25-38-56Z" fill="url(#shadow)" stroke="#738198" stroke-opacity=".3" stroke-width="3"/>
+  <path d="M204 502c58 31 134 31 192 0-10 75-43 118-96 137-53-19-86-62-96-137Z" fill="#05080d" stroke="#66758c" stroke-opacity=".35" stroke-width="3"/>
+  <path d="M232 555c43 20 93 20 136 0-15 43-38 64-68 73-30-9-53-30-68-73Z" fill="#111722"/>
+  <path d="M80 291c-8 135 36 253 123 327" fill="none" stroke="#74839a" stroke-opacity=".16" stroke-width="7"/>
+  <path d="M520 291c8 135-36 253-123 327" fill="none" stroke="#74839a" stroke-opacity=".16" stroke-width="7"/>
+</svg>

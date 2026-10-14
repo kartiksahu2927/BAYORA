@@ -1,0 +1,147 @@
+services:
+  bayora:
+    build: .
+    init: true
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      BAYORA_DATA_DIR: /var/lib/bayora
+      LLM_PROVIDER: ${LLM_PROVIDER:-fixture}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-10}
+      BAYORA_WORKER_TIMEOUT_SECONDS: ${BAYORA_WORKER_TIMEOUT_SECONDS:-15}
+      BAYORA_BOOTSTRAP_RED_PASSWORD: ${BAYORA_BOOTSTRAP_RED_PASSWORD:-}
+      BAYORA_BOOTSTRAP_BLUE_PASSWORD: ${BAYORA_BOOTSTRAP_BLUE_PASSWORD:-}
+      BAYORA_BOOTSTRAP_ADMIN_PASSWORD: ${BAYORA_BOOTSTRAP_ADMIN_PASSWORD:-}
+      BAYORA_BOOTSTRAP_AUDITOR_PASSWORD: ${BAYORA_BOOTSTRAP_AUDITOR_PASSWORD:-}
+      BAYORA_SESSION_COOKIE_SECURE: ${BAYORA_SESSION_COOKIE_SECURE:-0}
+      TINYFISH_API_KEY: ${TINYFISH_API_KEY:-}
+      TINYFISH_BASE_URL: ${TINYFISH_BASE_URL:-https://agent.tinyfish.ai/v1}
+      TINYFISH_TIMEOUT_SECONDS: ${TINYFISH_TIMEOUT_SECONDS:-30}
+      TINYFISH_POLL_INTERVAL_SECONDS: ${TINYFISH_POLL_INTERVAL_SECONDS:-2}
+      TINYFISH_MAX_DURATION_SECONDS: ${TINYFISH_MAX_DURATION_SECONDS:-120}
+      BAYORA_INTELLIGENCE_MAX_RESULTS: ${BAYORA_INTELLIGENCE_MAX_RESULTS:-20}
+      BAYORA_INTELLIGENCE_ALLOWED_SOURCES: ${BAYORA_INTELLIGENCE_ALLOWED_SOURCES:-}
+    volumes:
+      - bayora-database:/var/lib/bayora/database
+      - bayora-audit:/var/lib/bayora/audit
+      - bayora-application:/var/lib/bayora/application
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 2.0
+    networks:
+      - red-control
+      - blue-control
+      - llm
+      - audit
+      - provider-egress
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2).read()
+      interval: 10s
+      timeout: 4s
+      retries: 6
+      start_period: 5s
+
+  red-workload:
+    image: python:3.12-alpine
+    profiles: [security-tests]
+    init: true
+    command: ["python3", "-c", "import time; time.sleep(86400)"]
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 32
+    mem_limit: 128m
+    cpus: 0.5
+    user: "65532:65532"
+    networks:
+      - red-control
+    healthcheck:
+      test: ["CMD", "python3", "-c", "print('ready')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  blue-workload:
+    image: python:3.12-alpine
+    profiles: [security-tests]
+    init: true
+    command: ["python3", "-c", "import http.server; http.server.ThreadingHTTPServer(('0.0.0.0', 9090), http.server.SimpleHTTPRequestHandler).serve_forever()"]
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 32
+    mem_limit: 128m
+    cpus: 0.5
+    user: "65532:65532"
+    networks:
+      - blue-control
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.create_connection(('127.0.0.1', 9090), 1); s.close()"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [local-llm]
+    init: true
+    volumes:
+      - ollama-models:/root/.ollama
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 8g
+    cpus: 4.0
+    networks:
+      - llm
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
+
+networks:
+  red-control:
+    internal: true
+  blue-control:
+    internal: true
+  llm:
+    internal: true
+  audit:
+    internal: true
+  provider-egress:
+    name: bayora-provider-egress
+
+volumes:
+  bayora-database:
+  bayora-audit:
+  bayora-application:
+  ollama-models:
